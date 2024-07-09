@@ -9,8 +9,8 @@ contract VaultTest is Test {
     DemoToken public token;
 
     function setUp() public {
-        vault = new Vault();
         token = new DemoToken();
+        vault = new Vault(token);
         token.mint(address(this), 1000);
         token.approve(address(vault), 1000);
     }
@@ -28,10 +28,15 @@ contract VaultTest is Test {
 
     function test_DepositToken() public {
         vault.depositToken(100);
+        assertEq(vault.tokenBalances(address(this)), 100);
+        assertEq(token.balanceOf(address(vault)), 100);
     }
 
     function test_WithdrawToken() public {
+        vault.depositToken(100);
         vault.withdrawToken(100);
+        assertEq(vault.tokenBalances(address(this)), 0);
+        assertEq(token.balanceOf(address(this)), 1000); // original balance restored
     }
 
     receive() external payable {}
