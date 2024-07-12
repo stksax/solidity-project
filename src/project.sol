@@ -67,7 +67,7 @@ contract InvestPlatform {
         }
     }
 
-    function check(address _instruction, uint profit) external payable{
+    function calculateReward(address _instruction, uint profit) external payable{
         Investinstruction storage instruction = investinstruction[_instruction];
         require(msg.sender == instruction.stocksOrganization);
         require(block.timestamp >= instruction.date + 100000);
