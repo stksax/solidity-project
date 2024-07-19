@@ -10,7 +10,7 @@ contract InvestPlatform {
         uint investgoal;
         uint date;
         address payable[] investorList;
-        uint publicPool;
+        uint bountyPool;
         bool active;
     }
 
@@ -47,7 +47,7 @@ contract InvestPlatform {
         require(msg.value >= instruction.investbalance, "Insufficient balance for investment");
 
         instruction.investorList.push(payable(msg.sender));
-        instruction.publicPool += msg.value;
+        instruction.bountyPool += msg.value;
         instruction.deposit -= instruction.investbalance / 10;
 
         emit Invest(msg.sender, address(this), msg.value);
@@ -70,12 +70,12 @@ contract InvestPlatform {
             for (uint i = 0; i < instruction.investorList.length; i++) {
                 instruction.investorList[i].transfer(instruction.investgoal);
                 emit Transfer(_instruction, instruction.investorList[i], instruction.investgoal);
-                instruction.publicPool -= instruction.investgoal;
+                instruction.bountyPool -= instruction.investgoal;
             }
-            adviser.transfer(instruction.publicPool);
-            emit Transfer(_instruction, adviser, instruction.publicPool);
+            adviser.transfer(instruction.bountyPool);
+            emit Transfer(_instruction, adviser, instruction.bountyPool);
         } else {
-            uint insurance = (instruction.publicPool + instruction.deposit) / instruction.investorList.length;
+            uint insurance = (instruction.bountyPool + instruction.deposit) / instruction.investorList.length;
             for (uint i = 0; i < instruction.investorList.length; i++) {
                 instruction.investorList[i].transfer(insurance);
                 emit Transfer(_instruction, instruction.investorList[i], insurance);
@@ -85,7 +85,19 @@ contract InvestPlatform {
         instruction.active = false;
     }
 
-    // function getInvestinstruction(address addr) external view returns (Investinstruction memory) {
-    //     return investinstruction[addr];
-    // }
+    //for test
+    function changebountyPool(bool profitOrNot, uint deficit) external payable{
+        Investinstruction storage instruction = investinstruction[msg.sender];
+        if (profitOrNot == true){
+            instruction.bountyPool += msg.value;
+        }else{
+            instruction.bountyPool -= deficit;
+            payable(msg.sender).transfer(deficit);
+        }
+    }
+
+    //for test
+    function getInvestinstruction(address addr) external view returns (Investinstruction memory) {
+        return investinstruction[addr];
+    }
 }
