@@ -2,7 +2,7 @@
 pragma solidity ^0.8.24;
 
 import "forge-std/Test.sol";
-import "../src/project.sol"; 
+import "../src/InvestPlatform.sol"; 
 
 contract InvestPlatformTest is Test {
 
