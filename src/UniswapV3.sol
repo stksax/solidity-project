@@ -1,23 +1,15 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
-import './utils/DaiToken.sol';
-import './utils/WethToken.sol';
-// import '../lib/v3-periphery/contracts/NonfungiblePositionManager.sol';
+import './interfaces/IERC20.sol';
+import './interfaces/INonfungiblePositionManager.sol';
+import './interfaces/IERC721Receiver.sol';
 
-
-interface IERC721Receiver {
-    function onERC721Received(
-        address operator,
-        address from,
-        uint256 tokenId,
-        bytes calldata data
-    ) external returns (bytes4);
-}
+address constant DAI = 0x6B175474E89094C44Da98b954EedeAC495271d0F;
+address constant WETH = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
 
 contract UniswapV3Liquidity is IERC721Receiver {
-    DaiToken public dai;
-    WethToken public weth;
-    // NonfungiblePositionManager public nonfungiblePositionManager;
+    IERC20 private constant dai = IERC20(DAI);
+    IWETH private constant weth = IWETH(WETH);
 
     int24 private constant MIN_TICK = -887272;
     int24 private constant MAX_TICK = -MIN_TICK;
@@ -52,8 +44,8 @@ contract UniswapV3Liquidity is IERC721Receiver {
 
         INonfungiblePositionManager.MintParams memory params =
         INonfungiblePositionManager.MintParams({
-            token0: address(dai),
-            token1: address(weth),
+            token0: DAI,
+            token1: WETH,
             fee: 3000,
             tickLower: (MIN_TICK / TICK_SPACING) * TICK_SPACING,
             tickUpper: (MAX_TICK / TICK_SPACING) * TICK_SPACING,
@@ -136,69 +128,4 @@ contract UniswapV3Liquidity is IERC721Receiver {
         (amount0, amount1) =
             nonfungiblePositionManager.decreaseLiquidity(params);
     }
-}
-
-interface INonfungiblePositionManager {
-    struct MintParams {
-        address token0;
-        address token1;
-        uint24 fee;
-        int24 tickLower;
-        int24 tickUpper;
-        uint256 amount0Desired;
-        uint256 amount1Desired;
-        uint256 amount0Min;
-        uint256 amount1Min;
-        address recipient;
-        uint256 deadline;
-    }
-
-    function mint(MintParams calldata params)
-        external
-        payable
-        returns (
-            uint256 tokenId,
-            uint128 liquidity,
-            uint256 amount0,
-            uint256 amount1
-        );
-
-    struct IncreaseLiquidityParams {
-        uint256 tokenId;
-        uint256 amount0Desired;
-        uint256 amount1Desired;
-        uint256 amount0Min;
-        uint256 amount1Min;
-        uint256 deadline;
-    }
-
-    function increaseLiquidity(IncreaseLiquidityParams calldata params)
-        external
-        payable
-        returns (uint128 liquidity, uint256 amount0, uint256 amount1);
-
-    struct DecreaseLiquidityParams {
-        uint256 tokenId;
-        uint128 liquidity;
-        uint256 amount0Min;
-        uint256 amount1Min;
-        uint256 deadline;
-    }
-
-    function decreaseLiquidity(DecreaseLiquidityParams calldata params)
-        external
-        payable
-        returns (uint256 amount0, uint256 amount1);
-
-    struct CollectParams {
-        uint256 tokenId;
-        address recipient;
-        uint128 amount0Max;
-        uint128 amount1Max;
-    }
-
-    function collect(CollectParams calldata params)
-        external
-        payable
-        returns (uint256 amount0, uint256 amount1);
 }
