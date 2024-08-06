@@ -7,11 +7,16 @@ rustup update stable
 cargo install --git https://github.com/foundry-rs/foundry --profile release --locked forge cast chisel anvil
 ```
 
-run the test
+run uniswapV3 test
 ```shell
-forge test
+forge script test/UniswapV3LiquidityTest.sol --fork-url https://eth-mainnet.g.alchemy.com/v2/etKZmqnvvzqpjUnO1lU5YJ0LZoC3lRhs --broadcast
+forge script test/UniswapV3SwapTest.sol --fork-url https://eth-mainnet.g.alchemy.com/v2/etKZmqnvvzqpjUnO1lU5YJ0LZoC3lRhs --broadcast
 ```
 
+run other test
+```shell
+forge test --match-path test/InvestPlatformTest.sol
+```
 
 ## project discribe
 
